@@ -1,4 +1,10 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from 'react';
 import { supabase } from '@/lib/supabase';
 import type { SiteSettings, Theme } from '@/lib/types';
 
@@ -9,36 +15,43 @@ interface SettingsContextValue {
   refresh: () => Promise<void>;
 }
 
-const SettingsContext = createContext<SettingsContextValue | undefined>(undefined);
+const SettingsContext = createContext<SettingsContextValue | undefined>(
+  undefined
+);
 
-export function SettingsProvider({ children }: { children: ReactNode }) {
+export function SettingsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [theme, setTheme] = useState<Theme | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function loadSettings() {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const { data: settingsData, error: settingsError } = await supabase
-      .from('site_settings')
-      .select('*')
-      .limit(1)
-      .maybeSingle();
+      const { data: settingsData, error: settingsError } = await supabase
+        .from('site_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
 
-    if (settingsError) {
-      console.error('Error loading settings:', settingsError);
-      setSettings(null);
-      setTheme(null);
-      setLoading(false);
-      return;
-    }
+      if (settingsError) {
+        console.error('Erreur chargement site_settings:', settingsError);
+        return;
+      }
 
-    const siteSettings = settingsData as SiteSettings | null;
-    setSettings(siteSettings);
+      const siteSettings = settingsData as SiteSettings | null;
+      setSettings(siteSettings);
 
-    let activeTheme: Theme | null = null;
+      if (!siteSettings?.active_theme_id) {
+        setTheme(null);
+        applyTheme(null);
+        return;
+      }
 
-    if (siteSettings?.active_theme_id) {
       const { data: themeData, error: themeError } = await supabase
         .from('themes')
         .select('*')
@@ -46,16 +59,17 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         .maybeSingle();
 
       if (themeError) {
-        console.error('Error loading active theme:', themeError);
+        console.error('Erreur chargement thème:', themeError);
+        return;
       }
 
-      activeTheme = themeData as Theme | null;
+      const activeTheme = themeData as Theme | null;
+
+      setTheme(activeTheme);
+      applyTheme(activeTheme);
+    } finally {
+      setLoading(false);
     }
-
-    setTheme(activeTheme);
-    applyTheme(activeTheme);
-
-    setLoading(false);
   }
 
   useEffect(() => {
@@ -80,14 +94,12 @@ function applyTheme(theme: Theme | null) {
   const root = document.documentElement;
 
   if (!theme) {
-    root.style.removeProperty('--theme-primary');
-    root.style.removeProperty('--theme-secondary');
-    root.style.removeProperty('--theme-accent');
-    root.style.removeProperty('--theme-text');
-    root.style.removeProperty('--theme-background');
-    root.style.removeProperty('--theme-button');
-    root.style.removeProperty('--theme-hero-image');
-    root.style.removeProperty('--theme-font');
+    root.style.setProperty('--theme-primary', '#3D2817');
+    root.style.setProperty('--theme-secondary', '#C8A96A');
+    root.style.setProperty('--theme-accent', '#D4AF37');
+    root.style.setProperty('--theme-text', '#2A1F14');
+    root.style.setProperty('--theme-background', '#FAF6F0');
+    root.style.setProperty('--theme-button', '#3D2817');
     return;
   }
 
@@ -98,16 +110,19 @@ function applyTheme(theme: Theme | null) {
   root.style.setProperty('--theme-background', theme.background_color);
   root.style.setProperty('--theme-button', theme.button_color);
 
-  if (theme.hero_image) {
-    root.style.setProperty('--theme-hero-image', `url("${theme.hero_image}")`);
-  } else {
-    root.style.removeProperty('--theme-hero-image');
-  }
-
   if (theme.font_family) {
     root.style.setProperty('--theme-font', theme.font_family);
   } else {
     root.style.removeProperty('--theme-font');
+  }
+
+  if (theme.hero_image) {
+    root.style.setProperty(
+      '--theme-hero-image',
+      `url("${theme.hero_image}")`
+    );
+  } else {
+    root.style.removeProperty('--theme-hero-image');
   }
 }
 
@@ -115,7 +130,9 @@ export function useSettings() {
   const ctx = useContext(SettingsContext);
 
   if (!ctx) {
-    throw new Error('useSettings must be used within SettingsProvider');
+    throw new Error(
+      'useSettings must be used within SettingsProvider'
+    );
   }
 
   return ctx;
