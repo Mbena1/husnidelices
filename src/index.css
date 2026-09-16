@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   VARIABLES DU THÈME
+   ========================================================= */
+
+:root {
+  --theme-primary: #3D2817;
+  --theme-secondary: #C8A96A;
+  --theme-accent: #D4AF37;
+  --theme-text: #2A1F14;
+  --theme-background: #FAF6F0;
+  --theme-button: #3D2817;
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -9,18 +26,23 @@
   }
 
   body {
-    font-family: 'Inter', system-ui, sans-serif;
-    background-color: #FAF6F0;
-    color: #2A1F14;
+    font-family: var(--theme-font, 'Inter'), system-ui, sans-serif;
+    background-color: var(--theme-background, #FAF6F0);
+    color: var(--theme-text, #2A1F14);
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Playfair Display', serif;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--theme-font, 'Playfair Display'), serif;
   }
 
   ::selection {
-    background-color: #D4AF37;
-    color: #2A1F14;
+    background-color: var(--theme-accent, #D4AF37);
+    color: var(--theme-text, #2A1F14);
   }
 
   ::-webkit-scrollbar {
@@ -29,20 +51,30 @@
   }
 
   ::-webkit-scrollbar-track {
-    background: #F4EDE2;
+    background: color-mix(
+      in srgb,
+      var(--theme-secondary, #C8A96A) 20%,
+      var(--theme-background, #FAF6F0)
+    );
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #C8A96A;
+    background: var(--theme-secondary, #C8A96A);
     border-radius: 4px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #A88B4F;
+    background: var(--theme-primary, #3D2817);
   }
 }
 
+/* =========================================================
+   COMPOSANTS
+   ========================================================= */
+
 @layer components {
+  /* ---------- Glass ---------- */
+
   .glass {
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(12px);
@@ -51,39 +83,147 @@
   }
 
   .glass-dark {
-    background: rgba(42, 31, 20, 0.75);
+    background: color-mix(
+      in srgb,
+      var(--theme-primary, #3D2817) 75%,
+      transparent
+    );
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(212, 175, 55, 0.15);
+    border: 1px solid color-mix(
+      in srgb,
+      var(--theme-accent, #D4AF37) 15%,
+      transparent
+    );
   }
+
+  /* ---------- Bouton principal ---------- */
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary-800 text-cream-50 font-medium rounded-lg transition-all duration-300 hover:bg-primary-700 hover:shadow-lg hover:shadow-primary-800/20 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-medium rounded-lg transition-all duration-300 active:scale-95;
+
+    background-color: var(--theme-button, #3D2817);
+    color: var(--theme-background, #FAF6F0);
   }
+
+  .btn-primary:hover {
+    filter: brightness(1.1);
+
+    box-shadow: 0 10px 25px
+      color-mix(
+        in srgb,
+        var(--theme-button, #3D2817) 20%,
+        transparent
+      );
+  }
+
+  /* ---------- Bouton accent ---------- */
 
   .btn-accent {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 bg-accent-400 text-primary-900 font-medium rounded-lg transition-all duration-300 hover:bg-accent-300 hover:shadow-lg hover:shadow-accent-400/30 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-medium rounded-lg transition-all duration-300 active:scale-95;
+
+    background-color: var(--theme-accent, #D4AF37);
+    color: var(--theme-text, #2A1F14);
   }
+
+  .btn-accent:hover {
+    filter: brightness(1.08);
+
+    box-shadow: 0 10px 25px
+      color-mix(
+        in srgb,
+        var(--theme-accent, #D4AF37) 30%,
+        transparent
+      );
+  }
+
+  /* ---------- Bouton outline ---------- */
 
   .btn-outline {
-    @apply inline-flex items-center justify-center gap-2 px-6 py-3 border-2 border-primary-300 text-primary-800 font-medium rounded-lg transition-all duration-300 hover:border-primary-800 hover:bg-primary-800 hover:text-cream-50 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3 font-medium rounded-lg transition-all duration-300 active:scale-95;
+
+    border: 2px solid var(--theme-primary, #3D2817);
+    color: var(--theme-primary, #3D2817);
+    background-color: transparent;
   }
+
+  .btn-outline:hover {
+    background-color: var(--theme-primary, #3D2817);
+    color: var(--theme-background, #FAF6F0);
+  }
+
+  /* ---------- Bouton ghost ---------- */
 
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-primary-700 font-medium rounded-lg transition-all duration-200 hover:bg-primary-50 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 font-medium rounded-lg transition-all duration-200 active:scale-95;
+
+    color: var(--theme-primary, #3D2817);
   }
+
+  .btn-ghost:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--theme-primary, #3D2817) 8%,
+      transparent
+    );
+  }
+
+  /* ---------- Champs ---------- */
 
   .input-field {
-    @apply w-full px-4 py-3 bg-cream-50 border border-cream-300 rounded-lg text-primary-900 placeholder:text-primary-400 focus:outline-none focus:ring-2 focus:ring-accent-400 focus:border-transparent transition-all duration-200;
+    @apply w-full px-4 py-3 rounded-lg transition-all duration-200;
+
+    background-color: var(--theme-background, #FAF6F0);
+    border: 1px solid color-mix(
+      in srgb,
+      var(--theme-secondary, #C8A96A) 50%,
+      transparent
+    );
+    color: var(--theme-text, #2A1F14);
   }
 
+  .input-field::placeholder {
+    color: color-mix(
+      in srgb,
+      var(--theme-text, #2A1F14) 45%,
+      transparent
+    );
+  }
+
+  .input-field:focus {
+    outline: none;
+
+    border-color: transparent;
+
+    box-shadow: 0 0 0 2px
+      var(--theme-accent, #D4AF37);
+  }
+
+  /* ---------- Cartes ---------- */
+
   .card {
-    @apply bg-white rounded-2xl shadow-sm border border-cream-200 transition-all duration-300;
+    @apply bg-white rounded-2xl shadow-sm transition-all duration-300;
+
+    border: 1px solid color-mix(
+      in srgb,
+      var(--theme-secondary, #C8A96A) 25%,
+      transparent
+    );
   }
 
   .card-hover {
-    @apply hover:shadow-xl hover:shadow-primary-900/5 hover:border-accent-200 hover:-translate-y-1;
+    @apply hover:shadow-xl hover:-translate-y-1;
   }
+
+  .card-hover:hover {
+    border-color: color-mix(
+      in srgb,
+      var(--theme-accent, #D4AF37) 45%,
+      transparent
+    );
+  }
+
+  /* ---------- Sections ---------- */
 
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 py-16 lg:py-24;
@@ -93,17 +233,31 @@
     @apply max-w-7xl mx-auto;
   }
 
+  /* ---------- Texte doré ---------- */
+
   .text-gradient-gold {
-    background: linear-gradient(135deg, #D4AF37 0%, #C8A96A 50%, #D4AF37 100%);
+    background: linear-gradient(
+      135deg,
+      var(--theme-accent, #D4AF37) 0%,
+      var(--theme-secondary, #C8A96A) 50%,
+      var(--theme-accent, #D4AF37) 100%
+    );
+
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
+  /* ---------- Badge ---------- */
+
   .badge {
     @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium;
   }
 }
+
+/* =========================================================
+   UTILITAIRES
+   ========================================================= */
 
 @layer utilities {
   .text-balance {
@@ -117,7 +271,49 @@
   .preserve-3d {
     transform-style: preserve-3d;
   }
+
+  /* Couleurs dynamiques accessibles aux composants */
+
+  .theme-primary {
+    color: var(--theme-primary, #3D2817);
+  }
+
+  .theme-secondary {
+    color: var(--theme-secondary, #C8A96A);
+  }
+
+  .theme-accent {
+    color: var(--theme-accent, #D4AF37);
+  }
+
+  .theme-text {
+    color: var(--theme-text, #2A1F14);
+  }
+
+  .theme-background {
+    background-color: var(--theme-background, #FAF6F0);
+  }
+
+  .theme-primary-bg {
+    background-color: var(--theme-primary, #3D2817);
+  }
+
+  .theme-secondary-bg {
+    background-color: var(--theme-secondary, #C8A96A);
+  }
+
+  .theme-accent-bg {
+    background-color: var(--theme-accent, #D4AF37);
+  }
+
+  .theme-button-bg {
+    background-color: var(--theme-button, #3D2817);
+  }
 }
+
+/* =========================================================
+   ACCESSIBILITÉ / ANIMATIONS
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   *,
